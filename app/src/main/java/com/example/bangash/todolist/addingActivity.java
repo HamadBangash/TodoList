@@ -116,7 +116,7 @@ public class addingActivity extends AppCompatActivity {
         Intent intent = new Intent(addingActivity.this, notificationReceiver.class);
         intent.putExtra("Title", etTitle.getText().toString());
         intent.putExtra("Des", etDiscription.getText().toString());
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(addingActivity.this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(addingActivity.this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         alarmManager.set(alarmManager.RTC_WAKEUP, myCalender.getTimeInMillis(), pendingIntent);
 
@@ -172,7 +172,7 @@ public class addingActivity extends AppCompatActivity {
         @Override
         public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
             Year = year;
-            Month = monthOfYear + 1;
+            Month = monthOfYear ;
             Day = dayOfMonth;
         }
     };
