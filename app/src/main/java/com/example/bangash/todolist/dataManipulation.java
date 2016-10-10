@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,48 +43,6 @@ public class dataManipulation {
         }
     }
 
-    /////////////////////////////////////////////////Retrieving All Data Through Id///////////////////////////////////
-//    public List<String> RetrievingAllData(int id)
-//    {
-//        database = helper.getReadableDatabase();
-//        List<String> DataList = new ArrayList<>();
-//        String query = "SELECT * FROM TABLE_ACTIVITIES WHERE ID='"+id+"'";
-//        Cursor cursor = database.rawQuery(query, null);
-//        String Titles = "";
-//        int Year = 0;
-//        int Month = 0;
-//        int Day = 0;
-//        int Hours = 0;
-//        String Minutes = "";
-//        String AM_PM = "";
-//        String Description = "";
-//
-//        if (cursor.getCount() > 0) {
-//            cursor.moveToFirst();
-//            do {
-//                Titles = cursor.getString(cursor.getColumnIndex("TITLE"));
-//                Year = cursor.getInt(cursor.getColumnIndex("YEAR"));
-//                Month = cursor.getInt(cursor.getColumnIndex("MONTH"));
-//                Day = cursor.getInt(cursor.getColumnIndex("DAY"));
-//                Hours = cursor.getInt(cursor.getColumnIndex("HOURS"));
-//                Minutes = cursor.getString(cursor.getColumnIndex("MINUTES"));
-//                AM_PM = cursor.getString(cursor.getColumnIndex("AM_PM"));
-//                Description = cursor.getString(cursor.getColumnIndex("DESCRIPTION"));
-//                DataList.add(Titles);
-//                DataList.add(String.valueOf(Year));
-//                DataList.add(String.valueOf(Month));
-//                DataList.add(String.valueOf(Day));
-//                DataList.add(String.valueOf(Hours));
-//                DataList.add(Minutes);
-//                DataList.add(AM_PM);
-//                DataList.add();
-//            }
-//            while (cursor.moveToNext());
-//            database.close();
-//
-//        }
-//        return DataList;
-//    }
 
     ///////////////////////////////////////////Retrieving Titles//////////////////////////////////////////////
 
@@ -457,6 +417,42 @@ public class dataManipulation {
         String query = "UPDATE TABLE_ACTIVITIES SET TITLE='" + Titles + "',YEAR='" + Year + "',MONTH='" + Month + "',DAY='" + Day + "',HOURS='" + Hours + "',MINUTES='" + Minutes + "',AM_PM='" + AM_PM + "',DESCRIPTION='" + Description + "' WHERE ID='" + id + "'";
         database.execSQL(query);
 
+    }
+
+    ////////////////////////////////////////Inserting Data into another Table//////////////////////////////////////////////////
+    public void insertTableSecondData(int id, Context context) {
+
+        database = helper.getReadableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("ID", id);
+        long Result = database.insert("TABLE_IDS", null, values);
+        if (Result != -1) {
+            Toast.makeText(context, "Data Inserted", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(context, "Data Not Inserted", Toast.LENGTH_SHORT).show();
+        }
+        database.close();
+
+    }
+
+    ////////////////////////////////////////Retrieving data from another Table//////////////////////////////////////////////////
+
+    public List<Integer> retrievingSecondTableData() {
+        database = helper.getReadableDatabase();
+        List<Integer> idList = new ArrayList<>();
+        String query = "SELECT ID FROM TABLE_IDS ";
+        Cursor cursor = database.rawQuery(query, null);
+        int id = 0;
+        if (cursor.getCount() > 0) {
+            cursor.moveToFirst();
+            do {
+                id = cursor.getInt(cursor.getColumnIndex("ID"));
+                idList.add(id);
+            }
+            while (cursor.moveToNext());
+            database.close();
+        }
+        return idList;
     }
 
 }

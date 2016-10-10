@@ -43,7 +43,7 @@ public class editingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editing);
 
-        etTitle = (EditText) findViewById(R.id.etTitle);
+        etTitle = (EditText) findViewById(R.id.tvTitle);
         etDiscription = (EditText) findViewById(R.id.etDescription);
         btnTime = (Button) findViewById(R.id.btnTime);
         btnDate = (Button) findViewById(R.id.btnDate);
@@ -60,6 +60,29 @@ public class editingActivity extends AppCompatActivity {
         t_Hours = myCalender.get(Calendar.HOUR_OF_DAY);
         t_Minutes = myCalender.get(Calendar.MINUTE);
 
+
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        SettingData();
+        btnUpdate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String minute_increment = "";
+                int id = getIntent().getIntExtra("ID", 0);
+                titles = etTitle.getText().toString();
+                description = etDiscription.getText().toString();
+                SettingAM_PM();
+                if (t_Minutes < 10) {
+                    minute_increment = "0";
+                }
+                manipulation.UpdatingData(titles, t_Year, t_Month, t_Day, t_Hours, minute_increment + t_Minutes, t_AM_PM, description, id);
+                finish();
+            }
+        });
         btnDate.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -73,24 +96,6 @@ public class editingActivity extends AppCompatActivity {
                 showDialog(Time_Dialog_ID);
 
 
-            }
-        });
-        btnCancel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
-        SettingData();
-        btnUpdate.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int id = getIntent().getIntExtra("ID", 0);
-                titles = etTitle.getText().toString();
-                description = etDiscription.getText().toString();
-                SettingAM_PM();
-                manipulation.UpdatingData(titles, t_Year, t_Month, t_Day, t_Hours, mm_precede + t_Minutes, t_AM_PM, description, id);
-                finish();
             }
         });
 
@@ -118,10 +123,8 @@ public class editingActivity extends AppCompatActivity {
         minutes = Minutes.toString().replaceAll("(^\\[|\\]$)", "");
         am_pm = AM_PM.toString().replaceAll("(^\\[|\\]$)", "");
         description = Description.toString().replaceAll("(^\\[|\\]$)", "");
-
-        SettingAM_PM();
         etTitle.setText(titles);
-        btnTime.setText(hours + ":" + mm_precede + minutes + t_AM_PM);
+        btnTime.setText(hours + ":" + minutes + am_pm);
         btnDate.setText(day + "-" + month + "-" + year);
         etDiscription.setText(description);
     }
@@ -170,10 +173,14 @@ public class editingActivity extends AppCompatActivity {
     TimePickerDialog.OnTimeSetListener timeListener = new TimePickerDialog.OnTimeSetListener() {
         @Override
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+            String minute_increment = "";
             t_Hours = hourOfDay;
             t_Minutes = minute;
             SettingAM_PM();
-            btnTime.setText(t_Hours + ":" + mm_precede + t_Minutes + t_AM_PM);
+            if (t_Minutes < 10) {
+                minute_increment = "0";
+            }
+            btnTime.setText(t_Hours + ":" + minute_increment + t_Minutes + t_AM_PM);
         }
     };
 }

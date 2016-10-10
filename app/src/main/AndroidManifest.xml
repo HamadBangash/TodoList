@@ -15,9 +15,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".editingActivity"></activity>
-        <activity android:name=".addingActivity"></activity>
-        
+        <activity android:name=".editingActivity" />
+        <activity android:name=".addingActivity" />
+
+        <receiver android:name=".notificationReceiver"/>
+        <service android:name=".RingtoneService"/>
+
+        <activity android:name=".detailsActivity"></activity>
     </application>
 
 </manifest>

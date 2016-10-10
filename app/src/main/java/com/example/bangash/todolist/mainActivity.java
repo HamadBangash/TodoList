@@ -97,15 +97,16 @@ public class mainActivity extends AppCompatActivity {
             TextView tvTime = (TextView) view.findViewById(R.id.tvTime);
             TextView tvDate = (TextView) view.findViewById(R.id.tvDate);
             tvListTitle.setText(Titles.get(position).toString());
+            String minute_increment = "";
             tvDate.setText(Day.get(position) + "/" + Month.get(position) + "/" + Year.get(position));
 
-            tvTime.setText(Hours.get(position) + ":" + Minutes.get(position) + AM_PM.get(position));
+            tvTime.setText(Hours.get(position) + ":" + minute_increment + Minutes.get(position) + AM_PM.get(position));
             btnEdit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    int id=ID.get(position);
-                Intent intent=new Intent(mainActivity.this,editingActivity.class);
-                    intent.putExtra("ID",id);
+                    int id = ID.get(position);
+                    Intent intent = new Intent(mainActivity.this, editingActivity.class);
+                    intent.putExtra("ID", id);
                     startActivity(intent);
                 }
             });

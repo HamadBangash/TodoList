@@ -1,17 +1,25 @@
 package com.example.bangash.todolist;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 public class addingActivity extends AppCompatActivity {
     EditText etTitle, etDiscription;
@@ -19,16 +27,22 @@ public class addingActivity extends AppCompatActivity {
     ImageButton btnCancel, btnSave;
     dataManipulation manipulation;
 
-    String Titles, Description, AM_PM, mm_precede="";
+    String Titles, Description, AM_PM = "", mm_precede = "";
     int Year, Month, Day, Hours, Minutes;
+    int Hours2, Minutes2;
     private int Date_Dialog_ID = 0, Time_Dialog_ID = 1;
+
+    Calendar myCalender;
+    Calendar myCalender2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_adding);
 
-        etTitle = (EditText) findViewById(R.id.etTitle);
+        SettingAM_PM();
+
+        etTitle = (EditText) findViewById(R.id.tvTitle);
         etDiscription = (EditText) findViewById(R.id.etDescription);
         btnTime = (ImageButton) findViewById(R.id.btnTime);
         btnDate = (ImageButton) findViewById(R.id.btnDate);
@@ -38,12 +52,14 @@ public class addingActivity extends AppCompatActivity {
 
 ////////////////////////////////////////////////////Calender setting for current values///////////////////////////////////////////////
 
-        Calendar myCalender=Calendar.getInstance();
-        Year=myCalender.get(Calendar.YEAR);
-        Month=myCalender.get(Calendar.MONTH);
-        Day=myCalender.get(Calendar.DAY_OF_MONTH);
-        Hours=myCalender.get(Calendar.HOUR_OF_DAY);
-        Minutes=myCalender.get(Calendar.MINUTE);
+        myCalender = Calendar.getInstance();
+        myCalender2 = Calendar.getInstance();
+        Year = myCalender.get(Calendar.YEAR);
+        Month = myCalender.get(Calendar.MONTH);
+        Day = myCalender.get(Calendar.DAY_OF_MONTH);
+        Hours = myCalender.get(Calendar.HOUR_OF_DAY);
+        Minutes = myCalender.get(Calendar.MINUTE);
+        Hours2 = myCalender.get(Calendar.HOUR_OF_DAY);
 
 ////////////////////////////////////////////////////Button listeners///////////////////////////////////////////////////////////////
 
@@ -67,17 +83,18 @@ public class addingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                if (etTitle.getText().length() <= 0) {
-                    etTitle.setError("Title Can't Be Empty!");
-                } else if (etDiscription.getText().length() <= 0) {
-                    etDiscription.setError("Give Some Description!");
+
+                if (myCalender2.get(Calendar.HOUR_OF_DAY) > Hours2 || myCalender2.get(Calendar.MINUTE) > Minutes2) {
+                    Toast.makeText(addingActivity.this, "Invalid Time Set", Toast.LENGTH_SHORT).show();
+                    Log.d("Minute current", myCalender2.get(Calendar.MINUTE) + "");
+                    Log.d("Minute set", Minutes2 + "");
+
                 } else {
                     SettingAM_PM();
                     addingData();
+                    settingNotifications();
                     finish();
                 }
-
-
             }
         });
 
@@ -90,31 +107,50 @@ public class addingActivity extends AppCompatActivity {
 
     }
 
+///////////////////////////////////////////Setting notification/////////////////////////////////////////////////////
 
-    ///////////////////////////////////////////Adding data/////////////////////////////////////////////////////
+    public void settingNotifications() {
+        myCalender.set(Calendar.HOUR_OF_DAY, Hours2);
+        myCalender.set(Calendar.MINUTE, Minutes2);
+        myCalender.set(Calendar.SECOND, 02);
+        Intent intent = new Intent(addingActivity.this, notificationReceiver.class);
+        intent.putExtra("Title", etTitle.getText().toString());
+        intent.putExtra("Des", etDiscription.getText().toString());
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(addingActivity.this, 0, intent, PendingIntent.FLAG_ONE_SHOT);
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        alarmManager.set(alarmManager.RTC_WAKEUP, myCalender.getTimeInMillis(), pendingIntent);
+
+
+    }
+
+//////////////////////////////////////////////Adding data/////////////////////////////////////////////////////
 
     public void addingData() {
+
+        if (Minutes < 10) {
+            mm_precede = "0";
+        }
         Titles = etTitle.getText().toString();
         Description = etDiscription.getText().toString();
-        manipulation.InsertingData(addingActivity.this, Titles, Year, Month+1, Day, Hours, mm_precede+ Minutes , AM_PM, Description);
+        Log.d("Hours Add", Hours + "");
+        Log.d("Am add", AM_PM);
+        manipulation.InsertingData(addingActivity.this, Titles, Year, Month + 1, Day, Hours, mm_precede + Minutes, AM_PM, Description);
     }
 
     ///////////////////////////////////////////Setting am_pm/////////////////////////////////////////////////////
     public void SettingAM_PM() {
-        AM_PM = " AM";
-        if (Hours >= 12) {
-            AM_PM = " PM";
-            if (Hours >= 13 && Hours < 24) {
-                Hours -= 12;
-            } else {
-                Hours = 12;
-            }
+
+        if (Hours > 12) {
+            Hours -= 12;
+            AM_PM = "PM";
         } else if (Hours == 0) {
-            Hours = 12;
-        }
-        if (Minutes < 10) {
-            mm_precede = "0";
-        }
+            Hours += 12;
+            AM_PM = "AM";
+        } else if (Hours == 12)
+            AM_PM = "PM";
+        else
+            AM_PM = "AM";
+
 
     }
 
@@ -143,9 +179,13 @@ public class addingActivity extends AppCompatActivity {
     TimePickerDialog.OnTimeSetListener timeListener = new TimePickerDialog.OnTimeSetListener() {
         @Override
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+            SettingAM_PM();
             Hours = hourOfDay;
             Minutes = minute;
-            SettingAM_PM();
+            Hours2 = hourOfDay;
+            Minutes2 = minute;
+
+
         }
     };
 }

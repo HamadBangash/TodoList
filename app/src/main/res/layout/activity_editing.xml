@@ -33,7 +33,7 @@
         <EditText
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:id="@+id/etTitle"
+            android:id="@+id/tvTitle"
             android:fontFamily="serif"
             android:hint="Title"
             android:layout_weight="1" />
