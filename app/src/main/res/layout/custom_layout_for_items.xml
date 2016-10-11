@@ -12,7 +12,7 @@
         android:id="@+id/tvListTitle"
         android:gravity="center"
         android:textSize="26dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="18dp"
         android:fontFamily="serif"
         android:textColor="@android:color/secondary_text_light"
         android:layout_weight="0.67" />
